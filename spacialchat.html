@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+    body {
+    background-image: linear-gradient(to top, #653DFF, #FADEFF); /* path to your image */
+    background-repeat: no-repeat;               /* prevent tiling */
+    background-size: cover;                     /* fill the whole page */
+    background-attachment: fixed;               /* keep image fixed on scroll */
+    }
+	.message {
+    color: white;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    padding: 10px; border: 2px solid white; background: linear-gradient(to bottom, #7E00FF, #B469FF);
+    border-radius: 10px;
+	}
+    .messages {
+    color: white;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    padding: 10px;
+    border: 2px solid white;
+    background: linear-gradient(to top, #7E00FF, #B469FF);
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 2px;
+
+    margin: 2px;
+    height: 300px;
+    overflow-y: auto;
+    }
+    .input {
+    color: white;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    padding: 10px;
+    border: 2px solid white;
+    background: linear-gradient(to top, #7E00FF, #B469FF);
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 2px;
+
+    margin: 2px;
+    }
+    .inpt {
+    placeholder: white;
+    color: white;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    padding: 10px; border: 2px solid white; background: linear-gradient(to bottom, #7E00FF, #B469FF);
+    border-radius: 10px;
+    margin: 5px;
+	}
+    .headt {
+    font-size:40px;
+    color: white;
+    text-shadow: -1px -1px 0 #000,
+                1px -1px 0 #000,
+                -1px 1px 0 #000,
+                1px 1px 0 #000;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    width: 300px;
+    border-radius: 10px;
+    margin: 5px;
+    padding: 10px; border: 2px solid white; background: linear-gradient(to bottom, #7E00FF, #B469FF);
+	}
+</style>
+	<body>
+        <p class="headt">Spacial-chat V1!</p>
+        <div class="messages">
+
+        </div>
+        <div class="input">
+            <form>
+                <input type="text" class="inpt" placeholder="Username...">
+                <input type="text" class="inpt" placeholder="Message...">
+                <button type="submit" class="inpt">Send</button>
+            </form>
+        </div>
+        <script type="module">
+            // Import the functions you need from the SDKs you need
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-app.js";
+            import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-analytics.js";
+            // TODO: Add SDKs for Firebase products that you want to use
+            // https://firebase.google.com/docs/web/setup#available-libraries
+
+            // Your web app's Firebase configuration
+            // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+            const firebaseConfig = {
+                apiKey: "AIzaSyAAwCY-8z5_mCzcj5jv0_TA0LNBMJHvx1E",
+                authDomain: "spacial-chat-76656.firebaseapp.com",
+                databaseURL: "https://spacial-chat-76656-default-rtdb.firebaseio.com",
+                projectId: "spacial-chat-76656",
+                storageBucket: "spacial-chat-76656.firebasestorage.app",
+                messagingSenderId: "657296899953",
+                appId: "1:657296899953:web:177ffce3c167ded53c40d0",
+                measurementId: "G-F2EG4QG27Z"
+            };
+
+            // Initialize Firebase
+            import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/12.19.0/firebase-database.js";
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            const form = document.querySelector("form");
+            const inputs = document.querySelectorAll('input');
+            const db = getDatabase();
+            const messagesRef = ref(db, "messages");
+
+            // The second match (index 1)
+            const username = inputs[0];
+            const messagee = inputs[1];
+            const chat = document.querySelector(".messages");
+
+            form.addEventListener("submit", function(event) {
+                event.preventDefault();
+
+                const message = document.createElement("p");
+                message.textContent = messagee.value;
+                const strong = document.createElement("strong");
+                strong.textContent = username.value;
+                const divclass = document.createElement("div");
+                divclass.className = "message";
+                chat.appendChild(divclass)
+                divclass.appendChild(strong);
+                divclass.appendChild(message);
+                push(messagesRef, {
+                    username: username.value,
+                    text: messagee.value
+                });
+
+                messagee.value = "";
+
+                localStorage.setItem("name", username.value);
+                localStorage.setItem("chat", chat.innerHTML);
+            });
+            window.addEventListener("load", function() {
+                alert("This website uses cookies, by clicking ok you accept our tray of cookies")
+                console.log("Page loaded via addEventListener");
+                const usernamel = localStorage.getItem("name")
+                const inputs = document.querySelectorAll('input');
+                const username = inputs[0];
+                const lchat = localStorage.getItem("chat")
+                const chat = document.querySelector(".messages");
+
+                username.value = usernamel;
+                chat.innerHTML = lchat;
+            });
+
+            onValue(messagesRef, function(snapshot) {
+                const data = snapshot.val();
+
+                chat.innerHTML = "";
+
+                for (const message of Object.values(data)) {
+                    const messageee = document.createElement("p");
+                    messageee.textContent = message.text;
+
+                    const strong = document.createElement("strong");
+                    strong.textContent = message.username;
+
+                    const divclass = document.createElement("div");
+                    divclass.className = "message";
+
+                    chat.appendChild(divclass);
+                    divclass.appendChild(strong);
+                    divclass.appendChild(messageee);
+                }
+            });
+        </script>
+    </body>
+</html>
